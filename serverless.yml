@@ -1,4 +1,5 @@
 service: notes-app-api
+useDotenv: true
 
 package:
   individually: true
@@ -14,10 +15,77 @@ provider:
   stage: dev
   region: eu-north-1
 
+  environment:
+    tableName: notes-app-table
+    stripeSecretKey: ${env:STRIPE_SECRET_KEY}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-north-1:354027914002:table/notes-app-table"
+
 functions:
-  hello:
-    handler: handler.hello
+  create:
+    handler: lambdas/create.main
     events:
       - http:
-          path: hello
+          path: notes
+          method: post
+          cors: true
+          authorizer: 
+            type: aws_iam
+  get:
+    handler: lambdas/get.main
+    events:
+      - http:
+          path: notes/{id}
           method: get
+          cors: true
+          authorizer: 
+            type: aws_iam
+  list:
+    handler: lambdas/list.main
+    events:
+      - http:
+          path: notes
+          method: get
+          cors: true
+          authorizer: 
+            type: aws_iam
+  update:
+    handler: lambdas/update.main
+    events:
+      - http:
+          path: notes/{id}
+          method: patch
+          cors: true
+          authorizer: 
+            type: aws_iam
+  delete:
+    handler: lambdas/delete.main
+    events:
+      - http:
+          path: notes/{id}
+          method: delete
+          cors: true
+          authorizer: 
+            type: aws_iam
+  billing:
+    handler: lambdas/billing.main
+    events:
+      - http:
+          path: billing
+          method: post
+          cors: true
+          authorizer: 
+            type: aws_iam
+
+resources:
+  - ${file(resources/api-gateway-errors.yml)}

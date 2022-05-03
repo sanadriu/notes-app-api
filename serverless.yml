@@ -49,7 +49,7 @@ functions:
           authorizer: 
             type: aws_iam
   get:
-    handler: lambdas/dummy.main
+    handler: lambdas/get.main
     events:
       - http:
           path: notes/{id}

@@ -6,9 +6,9 @@ const logs = [];
 
 export function init(event, context) {
 	debug("API Event", {
-		body: event.body,
-		pathParameters: event.pathParameters,
-		queryStringParameters: event.queryStringParameters,
+		body: event?.body,
+		pathParameters: event?.pathParameters,
+		queryStringParameters: event?.queryStringParameters,
 	});
 
 	timer.current = setTimeout(() => {

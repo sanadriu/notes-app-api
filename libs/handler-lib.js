@@ -8,7 +8,7 @@ export default function handler(lambda) {
 		};
 
 		try {
-			debug.init();
+			debug.init(event, context);
 
 			const { statusCode, ...result } = await lambda(event, context);
 

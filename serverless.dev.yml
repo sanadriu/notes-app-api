@@ -1,10 +1,6 @@
 service: notes-app-api
 useDotenv: true
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  table: ${self:custom.stage}-notes
-
 package:
   individually: true
 
@@ -16,27 +12,24 @@ plugins:
 provider:
   name: aws
   runtime: nodejs14.x
-  stage: prod
+  stage: dev
   region: eu-north-1
 
   environment:
-    tableName: ${self:custom.table}
+    tableName: notes-app-table
     stripeSecretKey: ${env:STRIPE_SECRET_KEY}
 
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action:
-            - dynamodb:DescribeTable
-            - dynamodb:Query
-            - dynamodb:Scan
-            - dynamodb:GetItem
-            - dynamodb:PutItem
-            - dynamodb:UpdateItem
-            - dynamodb:DeleteItem
-          Resource: 
-            Fn::GetAtt: [NotesTable, Arn]
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-north-1:354027914002:table/notes-app-table"
 
 functions:
   create:
@@ -49,7 +42,7 @@ functions:
           authorizer: 
             type: aws_iam
   get:
-    handler: lambdas/dummy.main
+    handler: lambdas/get.main
     events:
       - http:
           path: notes/{id}
@@ -96,8 +89,3 @@ functions:
 
 resources:
   - ${file(resources/api-gateway-errors.yml)}
-  - ${file(resources/dynamodb-table.yml)}
-  - ${file(resources/s3-bucket.yml)}
-  - ${file(resources/cognito-user-pool.yml)}
-  - ${file(resources/cognito-identity-pool.yml)}
-

@@ -12,7 +12,7 @@ async function lambda(event, context) {
 
 	const dbResGet = await dynamo.get(paramsGet);
 
-	if (!dbResGet.Attributes) {
+	if (!dbResGet.Item) {
 		return { statusCode: 404, success: false, message: "Note not found" };
 	}
 
